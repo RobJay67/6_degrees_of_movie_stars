@@ -1,0 +1,53 @@
+Add-Type -AssemblyName System.Windows.Forms
+
+# Create the form
+$form = New-Object System.Windows.Forms.Form
+$form.Text = 'System Information'
+$form.Size = New-Object System.Drawing.Size(800,600)
+$form.StartPosition = 'CenterScreen'
+
+# Create the TextBox
+$outputBox = New-Object System.Windows.Forms.TextBox
+$outputBox.Location = New-Object System.Drawing.Point(10,10)
+$outputBox.Size = New-Object System.Drawing.Size(760,540)
+$outputBox.Multiline = $true
+$outputBox.ScrollBars = 'Vertical'
+$form.Controls.Add($outputBox)
+
+# Get OS version
+$OSVersion = [System.Environment]::OSVersion.Version
+$outputBox.AppendText("OS Version: $OSVersion`r`n")
+
+# Get patch update information
+$UpdateSession = New-Object -ComObject Microsoft.Update.Session
+$UpdateSearcher = $UpdateSession.CreateUpdateSearcher()
+$HistoryCount = $UpdateSearcher.GetTotalHistoryCount()
+$UpdateHistory = $UpdateSearcher.QueryHistory(0, 10) # Get the last 10 updates
+$outputBox.AppendText("Patch Update Information:`r`n")
+$UpdateHistory | ForEach-Object {
+    $outputBox.AppendText("Title: " + $_.Title + "`r`n")
+    $outputBox.AppendText("Description: " + $_.Description + "`r`n")
+    $outputBox.AppendText("Date: " + $_.Date + "`r`n")
+    $outputBox.AppendText("------------------------`r`n")
+}
+
+# Get Microsoft Office build
+$OfficeVersion = $null
+$OfficePaths = "HKLM:\Software\Microsoft\Office\ClickToRun\Configuration", "HKLM:\Software\Microsoft\Office\16.0\Common\InstallRoot"
+foreach ($path in $OfficePaths) {
+    if (Test-Path -Path $path) {
+        $OfficeVersion = (Get-ItemProperty -Path $path).VersionToReport
+        if ($null -ne $OfficeVersion) {
+            break
+        }
+    }
+}
+
+if ($null -ne $OfficeVersion) {
+    $outputBox.AppendText("Microsoft Office Build: $OfficeVersion`r`n")
+} else {
+    $outputBox.AppendText("Microsoft Office not found or version information not available`r`n")
+}
+
+# Show the form
+$form.ShowDialog()
