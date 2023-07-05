@@ -1,0 +1,21 @@
+# Get OS version
+$OSVersion = [System.Environment]::OSVersion.Version
+Write-Host "OS Version: $OSVersion"
+
+# Get patch update information
+$UpdateSession = New-Object -ComObject Microsoft.Update.Session
+$UpdateSearcher = $UpdateSession.CreateUpdateSearcher()
+$HistoryCount = $UpdateSearcher.GetTotalHistoryCount()
+$UpdateHistory = $UpdateSearcher.QueryHistory(0, $HistoryCount)
+Write-Host "Patch Update Information:"
+$UpdateHistory | ForEach-Object {
+    Write-Host ("Title: " + $_.Title)
+    Write-Host ("Description: " + $_.Description)
+    Write-Host ("Date: " + $_.Date)
+    Write-Host ("------------------------")
+}
+
+# Get Microsoft Office build
+$OfficePath = Get-ChildItem -Path HKLM:\Software\Microsoft\Office\ClickToRun\Configuration
+$OfficeVersion = $OfficePath.GetValue("VersionToReport")
+Write-Host "Microsoft Office Build: $OfficeVersion"
