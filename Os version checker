@@ -1,0 +1,34 @@
+# Get OS version
+$OSVersion = [System.Environment]::OSVersion.Version
+Write-Host "OS Version: $OSVersion"
+
+# Get patch update information
+$UpdateSession = New-Object -ComObject Microsoft.Update.Session
+$UpdateSearcher = $UpdateSession.CreateUpdateSearcher()
+$HistoryCount = $UpdateSearcher.GetTotalHistoryCount()
+$UpdateHistory = $UpdateSearcher.QueryHistory(0, $HistoryCount)
+Write-Host "Patch Update Information:"
+$UpdateHistory | ForEach-Object {
+    Write-Host ("Title: " + $_.Title)
+    Write-Host ("Description: " + $_.Description)
+    Write-Host ("Date: " + $_.Date)
+    Write-Host ("------------------------")
+}
+
+# Get Microsoft Office build
+$OfficeVersion = $null
+$OfficePaths = "HKLM:\Software\Microsoft\Office\ClickToRun\Configuration", "HKLM:\Software\Microsoft\Office\16.0\Common\InstallRoot"
+foreach ($path in $OfficePaths) {
+    if (Test-Path -Path $path) {
+        $OfficeVersion = (Get-ItemProperty -Path $path).VersionToReport
+        if ($null -ne $OfficeVersion) {
+            break
+        }
+    }
+}
+
+if ($null -ne $OfficeVersion) {
+    Write-Host "Microsoft Office Build: $OfficeVersion"
+} else {
+    Write-Host "Microsoft Office not found or version information not available"
+}
