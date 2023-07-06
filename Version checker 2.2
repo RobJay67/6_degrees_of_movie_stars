@@ -1,0 +1,38 @@
+# Get computer name
+$ComputerName = $env:COMPUTERNAME
+
+# Get OS version and build number
+$OSVersion = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion").ReleaseId
+$OSBuild = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion").CurrentBuildNumber
+$OSBuildRevision = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion").UBR
+
+# Get Microsoft Office version
+$OfficeVersion = $null
+$OfficeKeys = Get-ChildItem -Path HKLM:\Software\Microsoft\Office | Where-Object { $_.PSChildName -match '^\d+\.\d+$' }
+if ($OfficeKeys) {
+    $OfficeVersion = $OfficeKeys | Sort-Object -Property PSChildName -Descending | Select-Object -First 1 -ExpandProperty PSChildName
+}
+
+# Output to a text file
+$outputFile = "C:\userdata\SystemInfo.txt"
+"Computer Name: $ComputerName" | Out-File $outputFile
+"OS Version: $OSVersion" | Out-File $outputFile -Append
+"OS Build: $OSBuild.$OSBuildRevision" | Out-File $outputFile -Append
+if ($null -ne $OfficeVersion) {
+    "Microsoft Office Version: $OfficeVersion" | Out-File $outputFile -Append
+} else {
+    "Microsoft Office not found" | Out-File $outputFile -Append
+}
+
+# Get patch update information
+$UpdateSession = New-Object -ComObject Microsoft.Update.Session
+$UpdateSearcher = $UpdateSession.CreateUpdateSearcher()
+$HistoryCount = $UpdateSearcher.GetTotalHistoryCount()
+$UpdateHistory = $UpdateSearcher.QueryHistory(0, 10) # Get the last 10 updates
+"Patch Update Information:" | Out-File $outputFile -Append
+$UpdateHistory | ForEach-Object {
+    "Title: " + $_.Title | Out-File $outputFile -Append
+    "Description: " + $_.Description | Out-File $outputFile -Append
+    "Date: " + $_.Date | Out-File $outputFile -Append
+    "------------------------" | Out-File $outputFile -Append
+}
