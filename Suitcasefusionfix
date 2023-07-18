@@ -1,0 +1,1 @@
+Get-Process | foreach{ $_.Name + " " + $_.Id + " " + ( $_.Modules | foreach{ $_.FileName }) } | Select-String "Extensis"
