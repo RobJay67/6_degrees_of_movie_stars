@@ -1,0 +1,30 @@
+# Define the DLL file path
+$dllPath = "C:\Path\To\Your.dll"
+
+# Check if the file exists
+if (Test-Path -Path $dllPath) {
+    Write-Host "DLL file found. Checking for issues..."
+
+    # Check the registry for blocked files
+    $blockedFilesKeyPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Associations"
+    $blockedFiles = Get-ItemProperty -Path $blockedFilesKeyPath -Name "LowRiskFileTypes" -ErrorAction SilentlyContinue
+    if ($blockedFiles) {
+        $extensions = $blockedFiles.LowRiskFileTypes.Split(";")
+        if (".dll" -in $extensions) {
+            Write-Host ".dll files are blocked in registry under Low Risk File Types."
+        }
+    }
+
+    # Check the file's Unblock status
+    $fileInfo = Get-Item -Path $dllPath
+    if ($fileInfo.Attributes -match "Blocked") {
+        Write-Host "This file is marked as blocked in Windows. Use the Unblock-File cmdlet to unblock it."
+    }
+
+    # Check for other possible administrative restrictions
+    # Additional logic could be added here depending on the specific scenario
+
+    Write-Host "Check completed."
+} else {
+    Write-Host "DLL file not found at the specified path."
+}
