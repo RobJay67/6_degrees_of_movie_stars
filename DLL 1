@@ -1,0 +1,31 @@
+# Define the DLL file path
+$dllPath = "C:\Path\To\Your.dll"
+
+# Check if the file exists
+if (Test-Path -Path $dllPath) {
+    Write-Host "DLL file found at $dllPath. Searching Event Logs for related issues..."
+
+    # Define the logs to search
+    $logsToSearch = "Application", "System"
+
+    # Search through the logs
+    $foundIssues = $false
+    foreach ($log in $logsToSearch) {
+        $events = Get-WinEvent -LogName $log -ErrorAction SilentlyContinue | Where-Object { $_.Message -like "*$dllPath*" }
+        if ($events) {
+            Write-Host "Found related events in $log log:"
+            $events | ForEach-Object {
+                Write-Host "Event ID: $($_.Id)"
+                Write-Host $_.Message
+                Write-Host ""
+            }
+            $foundIssues = $true
+        }
+    }
+
+    if (-not $foundIssues) {
+        Write-Host "No related events found in the specified logs."
+    }
+} else {
+    Write-Host "DLL file not found at the specified path: $dllPath."
+}
