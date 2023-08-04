@@ -1,0 +1,13 @@
+# Ask for the application name
+$appName = Read-Host "Remark Office"
+
+# Define the registry paths to search
+$registryPaths = "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall", "Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall"
+
+# Loop through the registry paths and search for the application name
+foreach ($path in $registryPaths) {
+    Write-Host "Searching in $path..."
+    Get-ChildItem -Path $path -Recurse | Where-Object { $_.Name -match $appName } | ForEach-Object {
+        Write-Host "Found: $($_.Name)"
+    }
+}
