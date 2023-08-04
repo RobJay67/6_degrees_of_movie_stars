@@ -1,0 +1,37 @@
+# Hard-code the application name
+$appName = "Remark Office"
+
+# Define the registry paths to search
+$registryPaths = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall", "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
+
+# Loop through the registry paths and search for the application name
+foreach ($path in $registryPaths) {
+    Write-Host "Searching in $path..."
+    Get-ChildItem -Path $path -Recurse | Where-Object { $_.Name -match $appName } | ForEach-Object {
+        Write-Host "Found: $($_.Name)"
+    }
+}
+
+# Hard-code the application name
+$appName = "Remark Office"
+
+# Define the registry paths to search
+$registryPaths = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall", "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall"
+
+# Loop through the registry paths and search for the application name
+foreach ($path in $registryPaths) {
+    Write-Host "Searching in $path..."
+    $keys = Get-ChildItem -Path $path -ErrorAction SilentlyContinue
+
+    if ($keys) {
+        Write-Host "Found $($keys.Count) keys. Searching for $appName..."
+        $keys | ForEach-Object {
+            $key = Get-ItemProperty -Path $_.PSPath
+            if ($key.DisplayName -like "*$appName*") {
+                Write-Host "Found: $($_.Name) - $($key.DisplayName)"
+            }
+        }
+    } else {
+        Write-Host "No keys found in $path or access denied."
+    }
+}
