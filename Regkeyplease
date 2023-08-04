@@ -1,0 +1,13 @@
+# Ask for the application name
+$appName = Read-Host "Please enter the application name you want to search for in the registry"
+
+# Define the registry paths to search
+$registryPaths = "HKLM:\Software", "HKCU:\Software"
+
+# Loop through the registry paths and search for the application name
+foreach ($path in $registryPaths) {
+    Write-Host "Searching in $path..."
+    Get-ChildItem -Path $path -Recurse | Where-Object { $_.Name -match $appName } | ForEach-Object {
+        Write-Host "Found: $($_.Name)"
+    }
+}
