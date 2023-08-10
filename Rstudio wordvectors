@@ -1,0 +1,1 @@
+devtools::install_url("http://github.com/bmschmidt/wordVectors/archive/master.zip")
