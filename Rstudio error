@@ -1,0 +1,2 @@
+Error: Failed to install 'unknown package' from GitHub:
+  SSL peer certificate or SSH remote key was not OK: [api.github.com] schannel: SEC_E_UNTRUSTED_ROOT (0x80090325) - The certificate chain was issued by an authority that is not trusted.
