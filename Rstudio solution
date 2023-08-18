@@ -1,0 +1,30 @@
+Robert, it seems like the error you're facing is related to SSL certificates or SSH keys. Here are a few potential solutions to address this issue:
+
+1. **Disable SSL Verification (Not Recommended for Production Systems):**
+   You can temporarily disable SSL verification within your R session. This is not a secure solution, but it can help you troubleshoot the problem:
+   ```R
+   httr::set_config(httr::config(ssl_verifypeer = 0L))
+   devtools::install_github("bmschmidt/wordVectors")
+   ```
+
+2. **Use HTTP Instead of HTTPS (Not Recommended for Production Systems):**
+   You might try to install from the HTTP URL directly:
+   ```R
+   devtools::install_url("http://github.com/bmschmidt/wordVectors/archive/master.zip")
+   ```
+
+3. **Update Certificates:**
+   It may be that your system's certificates are out of date. You can try updating the CA certificates by updating the 'caTools' package:
+   ```R
+   install.packages("caTools")
+   ```
+
+4. **Check GitHub Repository:**
+   Ensure that the repository path is correct, and it's publicly accessible. If the repository has moved or is private, you would encounter this error.
+
+5. **Manually Download and Install:**
+   You can manually download the ZIP file from GitHub and then use `devtools::install_local()` to install the package from the downloaded file.
+
+Just a critique of these solutions: Disabling SSL verification or using HTTP instead of HTTPS may expose you to security risks, especially on a production or sensitive system. These options are more for understanding the issue rather than permanent solutions.
+
+If the problem persists, please share any additional details about your R version, system, etc., and I'll do my best to help you out!
